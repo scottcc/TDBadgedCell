@@ -78,8 +78,7 @@ open class TDBadgedCell: UITableViewCell {
         drawBadge()
     }
     
-    /// Generate the badge image
-    internal func drawBadge() {
+    open func generateImage() -> UIImage? {
         // Calculate the size of our string
         let textSize : CGSize = NSString(string: badgeString).size(attributes:[NSFontAttributeName:UIFont.boldSystemFont(ofSize:CGFloat(badgeFontSize))])
         
@@ -99,7 +98,7 @@ open class TDBadgedCell: UITableViewCell {
         } else {
             badge.backgroundColor = badgeColor.cgColor
         }
-
+        
         badge.cornerRadius = (CGFloat(badgeRadius) < (badge.frame.size.height / 2)) ? CGFloat(badgeRadius) : CGFloat(badge.frame.size.height / 2)
         
         // Draw badge into graphics context
@@ -117,11 +116,19 @@ open class TDBadgedCell: UITableViewCell {
         NSString(string: badgeString).draw(in:CGRect(x:8, y:5, width:textSize.width, height:textSize.height), withAttributes: [
             NSFontAttributeName:UIFont.boldSystemFont(ofSize:CGFloat(badgeFontSize)),
             NSForegroundColorAttributeName: badgeTextColor ?? UIColor.clear
-        ])
+            ])
         
         let badgeImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
-
+        
+        return badgeImage
+    }
+    
+    /// Generate the badge image
+    internal func drawBadge() {
+        guard let badgeImage = generateImage()
+            else { return }
+        
         badgeView.frame = CGRect(x:0, y:0, width:badgeImage.size.width, height:badgeImage.size.height)
         badgeView.image = badgeImage
         
